@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+# Variables
+KAGGLE_DATASET="mohammedalsubaie/movies" # Replace with the Kaggle dataset slug
+S3_BUCKET="movies-myy-093024" # Replace with your S3 bucket name
+AWS_REGION="us-west-1" # Change to your desired AWS region
+ZIP_FILENAME="movies.zip" # Original zip file name
+
+# Function to handle errors
+handle_error() {
+  echo "== An error occurred. Exiting... =="
+  exit 1
+}
+
+# Step 1: Download the dataset from Kaggle
+echo "== Downloading dataset from Kaggle: $KAGGLE_DATASET =="
+kaggle datasets download -d "$KAGGLE_DATASET" || handle_error
+
+# Check if the zip file exists and is indeed a zip file
+if [[ -f "$ZIP_FILENAME" && "$ZIP_FILENAME" == *.zip ]]; then
+  echo "== Unzipping $ZIP_FILENAME into the 'data' folder =="
+
+  # Create the 'data' directory if it doesn't exist
+  mkdir -p data
+
+  # Unzip the contents into the 'data' folder
+  unzip "$ZIP_FILENAME" -d data || handle_error
+fi
+
+
+# Step 3: Loop through all unzipped files and upload each to S3
+echo "== Uploading files to S3 bucket: $S3_BUCKET =="
+for file in data/*; do
+  # Skip the original zip file
+  if [[ "$file" != "$ZIP_FILENAME" ]]; then
+    aws s3 cp "$file" "s3://$S3_BUCKET/" --region "$AWS_REGION" || handle_error
+  fi
+done
+
+echo "== All files uploaded successfully! =="

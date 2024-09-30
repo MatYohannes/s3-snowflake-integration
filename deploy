@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+STACK_NAME="S3-Snowflake"
+TEMPLATE_FILE="template.yaml"
+REGION="us-west-1"
+
+# Check if the ExternalId is provided
+if [ "$#" -ne 1 ]; then
+  echo "Usage: $0 <ExternalId>"
+  exit 1
+fi
+
+EXTERNAL_ID="$1"
+
+echo "== Deploying VPC stack: $STACK_NAME =="
+
+# Function to handle errors
+handle_error() {
+  echo "== An error occurred during the deployment process. Exiting... =="
+  exit 1
+}
+
+# Check if the stack already exists
+if aws cloudformation describe-stacks --stack-name "$STACK_NAME" --region "$REGION" > /dev/null 2>&1; then
+  echo "== Stack $STACK_NAME already exists. Updating the stack =="
+  aws cloudformation update-stack \
+    --stack-name "$STACK_NAME" \
+    --template-body "file://$TEMPLATE_FILE" \
+    --parameters ParameterKey=ExternalId,ParameterValue="$EXTERNAL_ID" \
+    --capabilities CAPABILITY_NAMED_IAM \
+    --region "$REGION" || handle_error
+else
+  echo "== Creating a new stack: $STACK_NAME =="
+  aws cloudformation create-stack \
+    --template-body "file://$TEMPLATE_FILE" \
+    --parameters ParameterKey=ExternalId,ParameterValue="$EXTERNAL_ID" \
+    --capabilities CAPABILITY_NAMED_IAM \
+    --region "$REGION" \
+    --stack-name "$STACK_NAME" || handle_error
+fi
+
+echo "== Deployment complete =="
