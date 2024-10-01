@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: movies_db
+    schema: movies_schema
+    tables:
+      - name: movies
+        description: "This table contains all movie-related data."
+        columns:
+          - name: movie_id
+            tests:
+              - not_null
+              - unique
+
