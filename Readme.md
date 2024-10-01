@@ -64,7 +64,7 @@ CREATE OR REPLACE STORAGE INTEGRATION aws_s3_integration
 type=external_stage
 storage_provider='S3'
 enabled=true
-storage_aws_role_arn='arn:aws:iam::014498645771:role/SnowflakeAccessRole' // Get from IAM role created
+storage_aws_role_arn='arn:aws:iam::<AWS Account Number>:role/SnowflakeAccessRole' // Get from IAM role created
 storage_allowed_locations=('s3://movies-myy-093024/') // Get from s3 bucket
 ;
 
