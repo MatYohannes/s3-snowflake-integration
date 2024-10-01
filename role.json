@@ -4,12 +4,12 @@
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "014498645771"
+        "AWS": "<AWS Acccount Number>"
       },
       "Action": "sts:AssumeRole",
       "Condition": {
         "StringEquals": {
-          "sts:ExternalId": "014498645771"
+          "sts:ExternalId": "<AWS Acccount Number>"
         }
       }
     }
